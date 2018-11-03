@@ -28,6 +28,7 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
     //文件末尾可以不加回车（不强制换行）
     'eol-last': 0,
+    'indent': 0,
     //在function的左括号前加空格
     'space-before-function-paren': 0
   }
