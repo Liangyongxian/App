@@ -1,13 +1,13 @@
 <template>
   <div class="recommend">
-    <div class="recommend-content">
+    <scroll ref="scroll" class="recommend-content" :data="discList">
       <div>
         <div v-if="recommends.length" class="slider-wrapper">
           <div class="slider-content">
             <slider>
               <div v-for="item in recommends">
                 <a :href="item.linkUrl">
-                  <img :src="item.picUrl" alt="">
+                  <img @load='loadImage' :src="item.picUrl" alt="">
                 </a>
               </div>
             </slider>
@@ -28,11 +28,12 @@
           </ul>
         </div>
       </div>
-    </div>
+    </scroll>
   </div>
 </template>
 
 <script>
+  import Scroll from '../../base/scroll/scroll'
   import Slider from '../../base/slider/slider'
   import {getRecommend, getDiscList} from '../../api/recommend'
   import {ERR_OK} from '../../api/config'
@@ -62,10 +63,22 @@
             this.discList = res.data.list
           }
         })
+      },
+      // eslint-disable-next-line
+      /*better-scroll的优化，如果this._getRecommend()存在延时，比如用setTimeout设置延时
+      * 那么在监听高度时候会缺少轮播图的高度，到时候滚动时候，就滚不到底部，缺失的高度就是轮播图的高度
+      * 加标志位是为了对图片监听一次就够了，不用监听多次浪费资源
+      * */
+      loadImage() {
+        if (!this.checkloaded) {
+          this.$refs.scroll.refresh()
+          this.checkloaded = true
+        }
       }
     },
     components: {
-      Slider
+      Slider,
+      Scroll
     }
   }
 </script>
