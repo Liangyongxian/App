@@ -38,7 +38,7 @@
 <script>
   import Scroll from '../../base/scroll/scroll'
   import Slider from '../../base/slider/slider'
-  import Loading from '../../base/Loading/Loading'
+  import Loading from '../../base/loading/loading'
   import {getRecommend, getDiscList} from '../../api/recommend'
   import {ERR_OK} from '../../api/config'
 

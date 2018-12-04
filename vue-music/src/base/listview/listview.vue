@@ -1,5 +1,11 @@
 <template>
-  <scroll class="listview" :data="data" ref="listview">
+  <scroll
+    class="listview"
+    :data="data" ref="listview"
+    :listenScroll="listenScroll"
+    @scroll="scroll"
+    :probeType="probeType"
+  >
     <ul>
       <li v-for="group in data" class="list-group" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
@@ -14,28 +20,45 @@
     <div class="list-shortcut" @touchstart="onShortcutTouchStart"
          @touchmove.stop.prevent="onShortcutTouchMove">
       <ul>
-        <li v-for="(item, index) in shortCutList" class="item"
-            :data-index="index">
+        <li v-for="(item, index) in shortCutList"
+            class="item"
+            :data-index="index"
+            :class="{'current':currentIndex===index}">
           {{item}}
         </li>
       </ul>
     </div>
-    <div>
-
+    <div class="list-fixed" v-show="fixedTitle" ref="fixed">
+      <h1 class="fixed-title">{{fixedTitle}}</h1>
+    </div>
+    <div v-show="!data.length" class="loading-container">
+      <Loading></Loading>
     </div>
   </scroll>
 </template>
 
 <script>
   import Scroll from 'base/scroll/scroll'
+  import Loading from 'base/loading/loading'
   import {getData} from 'common/js/dom'
 
   const ANCHOR_HEIGHT = 18
+  const TITLE_HEIGHT = 30
 
   export default {
     name: "listview",
     created() {
       this.touch = {}
+      this.listenScroll = true
+      this.listHeight = []
+      this.probeType = 3
+    },
+    data() {
+      return {
+        scrollY: -1,
+        currentIndex: 0,
+        diff: -1
+      }
     },
     props: {
       data: {
@@ -48,6 +71,12 @@
         return this.data.map((group) => {
           return group.title.substr(0, 1)
         })
+      },
+      fixedTitle() {
+        if (this.scrollY > 0) {
+          return ''
+        }
+        return this.data[this.currentIndex] ? this.data[this.currentIndex].title : ''
       }
     },
     methods: {
@@ -67,12 +96,90 @@
         let anchorIndex = parseInt(this.touch.anchorIndex) + delta
         this._scrollTo(anchorIndex)
       },
+      scroll(pos) {
+        /* eslint-disable */
+        /*对应scroll.vue中的me.$emit('scroll', pos)
+        * 滚动左侧，右侧滚到相应字母*/
+        this.scrollY = pos.y
+      },
       _scrollTo(index) {
+        /* eslint-disable */
+        /*对右边侧栏的index做处理*/
+        if (!index && index !== 0) {
+          return
+        }
+        if (index < 0) {
+          index = 0
+        } else if (index > this.listHeight.length - 2) {
+          index = this.listHeight.length - 2
+        }
+        /* eslint-disable */
+        /*scrollToElement已经做了边界处理*/
+        /*this.scrollY = -this.listHeight[index]是为了点击右边快速入口时候（已经能跳转了），相应字母会高亮*/
+        this.scrollY = -this.listHeight[index]
+        /* eslint-disable */
+        /*点击右侧字母，滚到左侧相应地方*/
         this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0)
+      },
+      _calculateHeight() {
+        this.listHeight = []
+        const list = this.$refs.listGroup
+        let height = 0
+        this.listHeight.push(height)
+        for (let i = 0; i < list.length; i++) {
+          let item = list[i]
+          height = height + item.clientHeight
+          this.listHeight.push(height)
+        }
+      }
+    },
+    watch: {
+      data() {
+        setTimeout(() => {
+          this._calculateHeight()
+        }, 20)
+      },
+      scrollY(newY) {
+        let listHeight = this.listHeight
+        /* eslint-disable */
+        /*当滚动到底部，newY>0*/
+        if (newY > 0) {
+          this.currentIndex = 0
+          return
+        }
+        /* eslint-disable */
+        /*当在中间滚动*/
+        for (let i = 0; i < listHeight.length - 1; i++) {
+          let height1 = listHeight[i]
+          let height2 = listHeight[i + 1]
+          /* eslint-disable */
+          /*!height2是指i为最后一个值则只有height1，没有height2；-newY是因为向下滚动时newY为负值，
+          而this.listHeight存放的是正值*/
+          if (-newY >= height1 && -newY < height2) {
+            this.currentIndex = i
+            this.diff = height2 + newY
+            return
+          }
+        }
+        /* eslint-disable */
+        /*当滚动到底部，且-newYY大于最后一个元素的上限，
+        减2是因为数组第一个为0，占用了一个位置，且index是从0数起，再减一*/
+        this.currentIndex = listHeight.length - 2
+      },
+      diff(newVal) {
+        let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0
+        if (this.fixedTop === fixedTop) {
+          return
+        }
+        this.fixedTop = fixedTop
+        /* eslint-disable */
+        /*将旧的title顶上去*/
+        this.$refs.fixed.style.transform = `translate3d(0,${fixedTop}px,0)`
       }
     },
     components: {
-      Scroll
+      Scroll,
+      Loading
     }
   }
 </script>
