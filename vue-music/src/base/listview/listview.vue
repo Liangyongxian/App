@@ -7,10 +7,10 @@
     :probeType="probeType"
   >
     <ul>
-      <li v-for="group in data" class="list-group" ref="listGroup">
+      <li v-for="group in data" :key="group.title" class="list-group" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
-          <li v-for="item in group.items" class="list-group-item">
+          <li v-for="item in group.items" :key="item.avatar" @click="selectItem(item)" class="list-group-item">
             <img v-lazy="item.avatar" alt="" class="avatar">
             <span class="name">{{item.name}}</span>
           </li>
@@ -21,6 +21,7 @@
          @touchmove.stop.prevent="onShortcutTouchMove">
       <ul>
         <li v-for="(item, index) in shortCutList"
+            :key="item"
             class="item"
             :data-index="index"
             :class="{'current':currentIndex===index}">
@@ -46,7 +47,7 @@
   const TITLE_HEIGHT = 30
 
   export default {
-    name: "listview",
+    name: 'listview',
     created() {
       this.touch = {}
       this.listenScroll = true
@@ -63,7 +64,7 @@
     props: {
       data: {
         type: Array,
-        default: []
+        default: () => []
       }
     },
     computed: {
@@ -80,6 +81,9 @@
       }
     },
     methods: {
+      selectItem(item) {
+        this.$emit('select', item)
+      },
       onShortcutTouchStart(e) {
         /* eslint-disable */
         /* anchorIndex获取左侧边栏的字母索引，然后scrollToElement转到相应的左侧字母块歌单中 */
