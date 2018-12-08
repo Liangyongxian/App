@@ -2,7 +2,8 @@ import {commonParams} from './config'
 import {getUid} from 'common/js/uid'
 import axios from 'axios'
 import {ERR_OK} from 'api/config'
-import jsonp from 'common/js/jsonp'
+/* eslint-disable */
+/*import jsonp from 'common/js/jsonp'*/
 
 const debug = process.env.NODE_ENV !== 'production'
 

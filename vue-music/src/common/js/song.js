@@ -1,4 +1,6 @@
-import {getLyric, getVKey, getSongsUrl} from 'api/song'
+/* eslint-disable */
+/*import {getLyric, getVKey, getSongsUrl} from 'api/song'*/
+import {getLyric, getSongsUrl} from 'api/song'
 import {ERR_OK} from 'api/config'
 import {Base64} from 'js-base64'
 
@@ -14,6 +16,7 @@ export default class Song {
     this.filename = `C400${this.mid}.m4a`
     this.url = url
   }
+
   getLyric() {
     if (this.lyric) {
       return Promise.resolve(this.lyric)
@@ -41,7 +44,7 @@ export function createSong(musicData) {
     album: musicData.albumname,
     duration: musicData.interval,
     image: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${musicData.albummid}.jpg?max_age=2592000`,
-    url: `http://isure.stream.qqmusic.qq.com/C100${musicData.songmid}.m4a?fromtag=32`
+    url: musicData.url
   })
 }
 

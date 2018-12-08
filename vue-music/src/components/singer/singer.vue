@@ -88,7 +88,7 @@
       /* eslint-disable */
       /*映射到mutation_types中的SET_SINGER，实现了提交，this.setSinger相当于使用this.$store.commit('SET_SINGER')*/
       ...mapMutations({
-        setSinger:'SET_SINGER'
+        setSinger: 'SET_SINGER'
       })
     },
     components: {
