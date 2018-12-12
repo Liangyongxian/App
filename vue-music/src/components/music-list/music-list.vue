@@ -21,7 +21,7 @@
       },
       songs: {
         type: Array,
-        default: []
+        default: () => []
       },
       title: {
         type: String,
