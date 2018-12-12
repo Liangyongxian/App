@@ -166,7 +166,7 @@
           }
         }
         /* eslint-disable */
-        /*当滚动到底部，且-newYY大于最后一个元素的上限，
+        /*当滚动到底部，且-newY大于最后一个元素的上限，
         减2是因为数组第一个为0，占用了一个位置，且index是从0数起，再减一*/
         this.currentIndex = listHeight.length - 2
       },
@@ -177,7 +177,7 @@
         }
         this.fixedTop = fixedTop
         /* eslint-disable */
-        /*将旧的title顶上去*/
+        /*将旧的title顶上去。fixedTop小于0时候，旧title被往上顶*/
         this.$refs.fixed.style.transform = `translate3d(0,${fixedTop}px,0)`
       }
     },

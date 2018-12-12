@@ -5,15 +5,32 @@
     </div>
     <!--v-text会将元素当成纯文本输出，v-html会将元素当成HTML标签解析后输出-->
     <h1 class="title" v-html="title"></h1>
-    <div class="bg-image" :style="bgStyle">
+    <div class="bg-image" :style="bgStyle" ref="bgImage">
       <div class="filter"></div>
     </div>
+    <div class="bg-layer" ref="layer"></div>
+    <scroll @scroll="scroll" :probe-tybe="probeType" :listen-scroll="listenScroll" :data="songs" class="list"
+            ref="list">
+      <div class="song-list-wrapper">
+        <song-list :songs="songs"></song-list>
+      </div>
+    </scroll>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
+  import Scroll from 'base/scroll/scroll'
+  import SongList from 'base/song-list/song-list'
+
+  const RESERVE_HEIGHT = 40
+
   export default {
     name: 'music-list',
+    data() {
+      return {
+        scrollY: 0
+      }
+    },
     props: {
       bgImage: {
         type: String,
@@ -28,10 +45,37 @@
         default: ''
       }
     },
+    created() {
+      this.probeType = 3
+      this.listenScroll = true
+    },
     computed: {
       bgStyle() {
         return `background-image:url(${this.bgImage})`
       }
+    },
+    mounted() {
+      this.imageHeight = this.$refs.bgImage.clientHeight
+      this.minTranslateY = -this.imageHeight + RESERVE_HEIGHT
+      this.$refs.list.$el.style.top = `${this.imageHeight}px`
+    },
+    methods: {
+      scroll(pos) {
+        this.scrollY = pos.y
+      }
+    },
+    watch: {
+      scrollY(newY) {
+        /* eslint-disable */
+        /*this.minTranslateY（固定的）, newY（变化的）是负值，所以取大的那个*/
+        let tranlateY = Math.max(this.minTranslateY, newY)
+        this.$refs.layer.style['transform'] = `translate3d(0,${tranlateY}px,0)`
+        this.$refs.layer.style['webkitTransform'] = `translate3d(0,${tranlateY}px,0)`
+      }
+    },
+    components: {
+      Scroll,
+      SongList
     }
   }
 </script>
