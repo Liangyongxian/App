@@ -22,7 +22,7 @@
     },
     methods: {
       getDesc(song) {
-        return `${song.singer}。${song.albun}`
+        return `${song.singer}·${song.albun}`
       }
     }
   }
