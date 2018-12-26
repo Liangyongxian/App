@@ -18,7 +18,7 @@
     <scroll @scroll="scroll" :probe-tybe="probeType" :listen-scroll="listenScroll" :data="songs" class="list"
             ref="list">
       <div class="song-list-wrapper">
-        <song-list :songs="songs"></song-list>
+        <song-list :songs="songs" @select="selectItem"></song-list>
       </div>
       <div class="loading-container" v-show="!songs.length">
         <loading></loading>
@@ -32,6 +32,7 @@
   import SongList from 'base/song-list/song-list'
   import {prefixStyle} from 'common/js/dom'
   import Loading from 'base/loading/loading'
+  import {mapActions} from 'vuex'
 
   const RESERVE_HEIGHT = 40
   const transform = prefixStyle('transform')
@@ -78,7 +79,14 @@
       },
       back() {
         this.$router.back()
-      }
+      },
+      selectItem(item, index) {
+        this.selectPlay({
+          list: this.songs,
+          index
+        })
+      },
+      ...mapActions(['selectPlay'])
     },
     watch: {
       scrollY(newY) {
@@ -101,11 +109,11 @@
           zIndex = 10
           this.$refs.bgImage.style.paddingTop = 0
           this.$refs.bgImage.style.height = `${RESERVE_HEIGHT}px`
-          this.$refs.playBtn.style.display='none'
+          this.$refs.playBtn.style.display = 'none'
         } else {
           this.$refs.bgImage.style.paddingTop = '70%'
           this.$refs.bgImage.style.height = 0
-          this.$refs.playBtn.style.display=''
+          this.$refs.playBtn.style.display = ''
         }
         this.$refs.bgImage.style.zIndex = zIndex
         this.$refs.bgImage.style[transform] = `scale(${scale})`
